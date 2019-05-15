@@ -1,0 +1,276 @@
+### Grep scrollable with colours omitting .o, .a and .elf
+
+grep --color=always -R --exclude=\*.{a,o,elf,d,map} --exclude=tags [search string] | less -R
+
+
+### bash
+
+find -name "[filename]" - find files recursively by name
+git grep "^#define\s\+\<[define name]" - search for #define's with an arbitrary number of spaces before the name
+du -sh [folder] - get size of folder incl contents
+
+
+### keep my fork up to date
+
+git pull upstream master
+git push
+
+### search back in history on command line
+
+Ctrl-r
+
+### uncrustify
+
+uncrustify -c ../../uncrustify-riot.cfg -f main.c -o main.c.uncrustified
+
+### look at hardware connections to laptop
+
+tail -f /var/log/kern.log
+
+or 
+
+dmesg -w - watch in real time
+
+
+
+### networking tools
+
+ip [link|address|route|...] - to do IP stuff. more versatile than ifconfig
+
+tcpdump -i eth0 -vv ip6   - watch 
+
+
+
+### python virtual environments
+
+virtualenv -p python3 envname - create virtual environment
+python3 -m venv env - create virtual environmenip a
+t
+python -m [location of main].__main__ - run a package directly
+~/bin/python3.5 -m venv repoman - create virtual environment. Useful if you want to use a specific installation of Python.
+source envname/bin/activate - activate virtual environment
+deactivate envname - deactivate virtual environment
+
+
+
+### Linux process management
+
+ps -ef | grep [keyword] - get information (e.g. pid) about a certain process
+
+
+
+### Useful VIM commands
+
+:so % - reload .vimrc file if you're editing it
+:so ~/.vimrc - reload .vimrc if not editing it
+:edit [filename] - load file from within vim
+Add github repo in vim-plug section in ~/.vimrc, then reload .vimrc file, then :PlugUpdate - add vim plugin
+
+:make - run make
+:!./foo - execute program foo
+
+| - pipe commands into each other
+
+:set foldmethod=syntax - set code folding to be based on the language
+zm - increase foldlevel by one
+zM - close all folds
+zr - decrease foldlevel by one
+zR - open all folds
+zo - open fold at cursor
+zO - open all folds at cursor
+zc - close fold at cursor
+
+gq[range] - format paragraph according to textwidth (etc). Can also be done for visual selection.
+
+https://wolfgangmehner.github.io/vim-plugins/csupport/c-hotkeys.pdf - c vim hotkeys
+
+ctags -R [--languages=python] * - run Ctags recursively over the current directory and subdirectories
+Ctrl-] - Jump to the tag underneath the cursor
+:ts <tag> <RET> - Search for a particular tag
+:tn - Go to the next definition for the last tag
+:tp - Go to the previous definition for the last tag
+:ts - List all of the definitions of the last tag
+Ctrl-t - Jump back up in the tag stack
+
+[i]gt - go to tab at position i
+
+Ctrl-N and Ctrl-P - cycle through autocomplete entries
+
+Ctrl-o - go back to previous buffer
+Ctrl-i - go to next buffer
+
+Ctrl-W + [H | J | K | L] - move current window to far left/bottom/top/right
+[num] + Ctrl-w + [< | - | + | >] - resize pane
+
+Whitespace checks:
+set list
+set lcs:tab:\ \ ,nbsp:·,trail:·
+
+or 
+
+:set listchars=eol:$,tab:>-,trail:~,extends:>,precedes:<
+
+set numbers - display line numbers
+
+
+Other configs I have commented as a reference
+
+"set listchars=nbsp:¤,trail:¤,extends:>,precedes:<
+"set lcs:nbsp:·,trail:· 
+
+### vim text editing commands
+
+f[character] - move forward to the character
+F[character] - move backward to the character
+t[character] - move forward to just before the character
+T[character] - move backward to just after the character
+
+
+### git
+
+git branch -vv - list all branches and what they're tracking
+git branch -f branch-name new-tip-commit - move a branch to another commit
+git branch A' A - create copy A' of branch A
+git rebase --onto B master A' - rebase A' on top of B
+git reset --soft HEAD~1 - remove last commit without losing actual file changes (e.g. for re-committing in a different way)
+git reset --hard HEAD~1 - remove last commit while losing actual file changes
+git clean -fdn - git clean force, directories, dry run options
+
+drivers/sdcard_spi: Reduce "wait for not busy"
+
+replace master entirely from another branch:
+git checkout branchname
+git merge -s ours master
+git checkout master
+git merge branchname
+    
+
+### setting up hurricane electric RIOT ipv6 tunnel
+
+on raspberry pi:
+
+ifconfig sit0 up
+ifconfig sit0 inet6 tunnel ::216.66.86.114
+ifconfig sit1 up
+ifconfig sit1 inet6 add 2001:470:6c:451::2/64
+ip -6 route add default dev sit1
+
+sudo ip -6 route add 2001:470:6d:451::/64 dev lowpan0      (to route traffic through the lowpan interface)
+
+sudo ip -6 add add 2001:470:6d:451:1ac0:ffee:1ac0:ffee dev lowpan0  (to give an ip address on the right subnet to the IPv6 interface. not sure if you need this, play around)
+
+### gedit
+ctrl-alt-pgup/dn - switch tabs
+ctrl -w - close tabs
+
+### docker
+
+docker run [container name] - run command in container
+docker run -p 4000:80 -it [container name] - run container and attach port 4000 of host to port 80 of container (port 80 must be exposed in Dockerfile using `EXPOSE 80`). And see stdout.
+docker build -t [container name]i . - build container and give it `container name`, using Dockerfile in current directory
+sudo dockerd --ipv6 --fixed-cidr-v6=2001:db8:1::/64 - start docker daemon with IPv6 support and subnet 2001:db8:1::/64
+systemctl reload docker - reload docker daemon through systemctl. Note for changes to /etc/docker/daemon.json, you need to `stop` then `start`
+systemctl enable docker - enable docker daemon through systemctl
+systemctl start docker  - start docker daemon through systemctl
+docker exec -it [container name] bash - get a bash prompt into the container
+docker network inspect bridge - look at what's connected to a certain network (bridge, in this instance)
+docker ps - see running containers
+docker restart 
+docker run -it --entrypoint="/bin/bash" -v $(pwd):/app2 -p 4000:80 otaserver - override the default command ("-it --entrypoint") and open up a bash shell; bind a folder in the host to a folder in the container ("-v"; folder in container must not exist unless you give the third argument as :ro and folder in host must be given as an absolute path)
+
+#### notes on how docker works
+
+- docker build - copies all files into the container. Unless binding a host folder to the container, which allows you to edit files in place
+
+### install libcoap
+
+https://github.com/fridalufa/smart-environment/wiki/Install-libcoap-for-testing
+but, instead of doing `export LD_LIBRARY_PATH=/usr/local/lib`, type `ldconfig` after `sudo make install`
+
+
+### hexdump
+
+hexdump -e '16/1 "%02x " "\n"' [file.bin] - hex bytes only, no addresses
+
+
+### general linux installation tips
+
+<name> launchpad - google this to find a package which builds a required library
+
+
+### gdb
+
+make debug - starts a debugging session
+gdb [filename.elf] - same as above (untested)
+Ctrl-x, a - goes into -tui when in gdb
+s - step into
+n - step over
+l - see the code at that point
+c - continue
+break [functionname, no brackets] - put breakpoint at that function name
+break [filename:linenumber] - breakpoint at that file name and line number
+print [variable name] - print variable name while stopped
+set [variable name]=[value] - set variable name to value
+quit - quit gdb
+run - run (from beginning)
+
+potential issues:
+- firmware loaded on isn't the same as the .elf file pointed to by gdb. The symbols need to be in the same place etc.
+
+
+### gnome-terminal
+
+ctrl-shift-t - open new tab
+ctrl-pgup/pgdn - shift through tabs
+set-title [title] - set title of tab or window (defined in my .bashrc)
+ctrl-shift-w - close tab
+ctrl-shift-q - close windowterm
+
+
+### tar
+
+tar cvzf [output filename with extension] [folder for compression] - create tar archive
+tar -xvf [file for extraction] -C [directory of file] - extract tar archive. Can omit -C option
+
+
+### debugging device or resource busy
+
+fuser /dev/ttyXXXX - shows processes using a resource. then kill the process
+screen -list, then screen -r [session name], then ctrl-A then type :quit - to kill a screen session, because if the tty is attached to a screen session it won't show up using fuser
+
+
+### looking at what's actually compiled
+
+make objdump - shows the disassembly of the program
+text - what ends up in flash. Functions, const data, interrupt vector table
+data - initialized data. Uses space in ROM (for the initialization value) and RAM (for the variable). value copied ROM to RAM in startup code.
+bss  - uninitialized data. RAM. Initialized to zero in startup code.
+dec  - text + data + bss
+
+
+### tmux
+
+shift + left mouse button - highlight text for copying
+
+
+### chrome
+
+ctrl + shift + del - go to "clear browsing data" page
+ctrl + F5 - hard refresh
+
+### riot-apps server logins
+
+api.riot-apps.net/admin - django admin
+ssh daniel@api.riot-apps.net - ssh into server
+
+
+### st-link tools
+
+st-flash --format ihex write [fname.hex] - write hex file (more convenient than bin as it has flash addresses embedded)
+st-flash erase - erase the board
+
+
+### shell scripts
+
+set -x - verbose mode
+
